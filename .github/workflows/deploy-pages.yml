@@ -123,7 +123,7 @@ jobs:
         run: |
           cd preview
           tar -xf artifact.tar
-          echo "Preview would be available at: https://criage.ru/"
+          echo "Preview would be available at: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
           echo "Files ready for deployment:"
           ls -la
 
@@ -133,7 +133,7 @@ jobs:
         with:
           script: |
             const { owner, repo, number } = context.issue;
-            const previewUrl = `https://criage.ru/`;
+            const previewUrl = `https://${owner}.github.io/${repo}`;
 
             const comment = `
             ## 🚀 Website Preview Ready!
