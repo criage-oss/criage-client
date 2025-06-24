@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Документация - Criage</title>
+    <meta name="description" content="Полная документация по использованию пакетного менеджера Criage">
+    <link rel="icon" type="image/png" href="../logo.png">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--background);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Main layout */
+        .docs-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem;
+            display: block;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Content */
+        .docs-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .docs-content h1 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .docs-content h2 {
+            color: var(--text-primary);
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            font-size: 1.8rem;
+        }
+
+        .docs-content h3 {
+            color: var(--text-primary);
+            margin: 1.5rem 0 0.75rem 0;
+            font-size: 1.3rem;
+        }
+
+        .docs-content h4 {
+            color: var(--text-primary);
+            margin: 1rem 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .docs-content p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .docs-content ul,
+        .docs-content ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        .docs-content li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 8px;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-block pre {
+            padding: 1.5rem;
+            margin: 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .inline-code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: var(--primary-color);
+        }
+
+        .note {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .example {
+            background: #f0fdf4;
+            border-left: 4px solid var(--success-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .docs-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-content {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="index_ru.html" class="logo">
+                <img src="logo.png" alt="Criage Logo">
+                Criage
+            </a>
+            <div class="nav-content">
+                <ul class="nav-links">
+                    <li><a href="index_ru.html">Главная</a></li>
+                    <li><a href="docs_ru.html">Документация</a></li>
+                    <li><a href="https://github.com/Zu-Krein/criage" target="_blank">GitHub</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <a href="docs.html" class="lang-btn">EN</a>
+                    <a href="docs_ru.html" class="lang-btn active">RU</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="docs-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <h3>Содержание</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="#installation" class="active">Установка</a></li>
+                    <li><a href="#basic-usage">Основы использования</a></li>
+                    <li><a href="#package-management">Управление пакетами</a></li>
+                    <li><a href="#development">Разработка пакетов</a></li>
+                    <li><a href="#repositories">Репозитории</a></li>
+                    <li><a href="#configuration">Конфигурация</a></li>
+                    <li><a href="#formats">Форматы сжатия</a></li>
+                    <li><a href="#troubleshooting">Решение проблем</a></li>
+                </ul>
+            </aside>
+
+            <!-- Content -->
+            <main class="docs-content">
+                <h1>Документация Criage</h1>
+                <p>Добро пожаловать в документацию Criage - высокопроизводительного пакетного менеджера, написанного на
+                    Go!</p>
+
+                <section id="installation">
+                    <h2>Установка</h2>
+
+                    <h3>Из исходного кода</h3>
+                    <p>Самый простой способ установить Criage - собрать из исходного кода:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre>git clone https://github.com/Zu-Krein/criage.git
+cd criage
+go build -o criage
+sudo mv criage /usr/local/bin/</pre>
+                    </div>
+
+                    <h3>Требования</h3>
+                    <ul>
+                        <li>Go 1.21 или выше</li>
+                        <li>Git для клонирования репозитория</li>
+                        <li>Права администратора для установки в системные пути</li>
+                    </ul>
+
+                    <h3>Проверка установки</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre>criage --version</pre>
+                    </div>
+
+                    <div class="note">
+                        <strong>Примечание:</strong> После установки перезапустите терминал или обновите переменную
+                        PATH.
+                    </div>
+                </section>
+
+                <section id="basic-usage">
+                    <h2>Основы использования</h2>
+
+                    <h3>Первые шаги</h3>
+                    <p>После установки Criage готов к использованию. Основные команды:</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Показать справку
+criage --help
+
+# Показать версию
+criage --version
+
+# Показать список установленных пакетов
+criage list</pre>
+                    </div>
+
+                    <h3>Структура команд</h3>
+                    <p>Criage использует структуру команд вида: <code
+                            class="inline-code">criage [команда] [параметры] [флаги]</code></p>
+
+                    <div class="example">
+                        <strong>Пример:</strong> <code
+                            class="inline-code">criage install my-package --version 1.2.3 --global</code>
+                    </div>
+                </section>
+
+                <section id="package-management">
+                    <h2>Управление пакетами</h2>
+
+                    <h3>Установка пакетов</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Установить пакет
+criage install package-name
+
+# Установить конкретную версию
+criage install package-name --version 1.2.3
+
+# Глобальная установка
+criage install package-name --global
+
+# Установить с dev зависимостями
+criage install package-name --dev
+
+# Установить локальный файл .criage
+criage install ./my-package-1.0.0.criage</pre>
+                    </div>
+
+                    <h3>Удаление пакетов</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Удалить пакет
+criage uninstall package-name
+
+# Полное удаление с конфигурацией
+criage uninstall package-name --purge
+
+# Удалить глобальный пакет
+criage uninstall package-name --global</pre>
+                    </div>
+
+                    <h3>Обновление пакетов</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Обновить пакет
+criage update package-name
+
+# Обновить все пакеты
+criage update --all
+
+# Обновить глобальные пакеты
+criage update --global</pre>
+                    </div>
+
+                    <h3>Поиск и информация</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Поиск пакетов
+criage search keyword
+
+# Показать информацию о пакете
+criage info package-name
+
+# Показать установленные пакеты
+criage list
+
+# Показать устаревшие пакеты
+criage list --outdated</pre>
+                    </div>
+                </section>
+
+                <section id="development">
+                    <h2>Разработка пакетов</h2>
+
+                    <h3>Создание нового пакета</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Создать пакет с базовыми настройками
+criage create my-package
+
+# Создать с дополнительными параметрами
+criage create my-package --author "Your Name" --description "Package description"</pre>
+                    </div>
+
+                    <h3>Структура пакета</h3>
+                    <p>Созданный пакет имеет следующую структуру:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre>my-package/
+├── criage.yaml          # Манифест пакета
+├── src/                 # Исходные файлы
+├── build.json          # Конфигурация сборки
+└── README.md           # Документация</pre>
+                    </div>
+
+                    <h3>Сборка пакета</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Сборка с настройками по умолчанию
+criage build
+
+# Указать формат и уровень сжатия
+criage build --format tar.zst --compression 6
+
+# Указать выходной файл
+criage build --output my-package-1.0.0.criage</pre>
+                    </div>
+
+                    <h3>Публикация пакета</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Опубликовать в репозитории
+criage publish --registry https://packages.example.com --token YOUR_TOKEN</pre>
+                    </div>
+                </section>
+
+                <section id="repositories">
+                    <h2>Управление репозиториями</h2>
+
+                    <h3>Добавление репозиториев</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Добавить репозиторий
+criage repo add myrepo https://packages.example.com
+
+# Добавить с токеном авторизации
+criage repo add private-repo https://private.example.com --token YOUR_TOKEN
+
+# Добавить с приоритетом
+criage repo add priority-repo https://priority.example.com --priority 10</pre>
+                    </div>
+
+                    <h3>Управление репозиториями</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Показать список репозиториев
+criage repo list
+
+# Показать информацию о репозитории
+criage repo info myrepo
+
+# Удалить репозиторий
+criage repo remove myrepo
+
+# Обновить индексы всех репозиториев
+criage repo update</pre>
+                    </div>
+
+                    <div class="note">
+                        <strong>Приоритет репозиториев:</strong> Высокий приоритет (большое число) означает, что пакеты
+                        из этого репозитория будут предпочтительны при поиске.
+                    </div>
+                </section>
+
+                <section id="configuration">
+                    <h2>Конфигурация</h2>
+
+                    <h3>Просмотр настроек</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Показать все настройки
+criage config list
+
+# Показать конкретную настройку
+criage config get cache.path</pre>
+                    </div>
+
+                    <h3>Изменение настроек</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Установить значение
+criage config set cache.path /custom/cache/path
+
+# Установить логический параметр
+criage config set parallel.enabled true</pre>
+                    </div>
+
+                    <h3>Основные параметры конфигурации</h3>
+                    <ul>
+                        <li><code class="inline-code">cache.path</code> - путь к кэшу пакетов</li>
+                        <li><code class="inline-code">parallel.enabled</code> - включить параллельную обработку</li>
+                        <li><code class="inline-code">compression.default</code> - алгоритм сжатия по умолчанию</li>
+                        <li><code class="inline-code">repository.timeout</code> - таймаут для запросов к репозиториям
+                        </li>
+                    </ul>
+                </section>
+
+                <section id="formats">
+                    <h2>Форматы сжатия</h2>
+
+                    <p>Criage поддерживает несколько алгоритмов сжатия для оптимизации размера и скорости:</p>
+
+                    <h3>Доступные форматы</h3>
+                    <ul>
+                        <li><strong>tar.zst</strong> - Zstandard (рекомендуется) - хороший баланс скорости и сжатия</li>
+                        <li><strong>tar.lz4</strong> - LZ4 - максимальная скорость, среднее сжатие</li>
+                        <li><strong>tar.xz</strong> - XZ/LZMA - максимальное сжатие, низкая скорость</li>
+                        <li><strong>tar.gz</strong> - Gzip - универсальная совместимость</li>
+                        <li><strong>zip</strong> - ZIP - совместимость с Windows</li>
+                    </ul>
+
+                    <h3>Выбор формата при сборке</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Использовать Zstandard с уровнем сжатия 3
+criage build --format tar.zst --compression 3
+
+# Использовать LZ4 для максимальной скорости
+criage build --format tar.lz4
+
+# Использовать XZ для минимального размера
+criage build --format tar.xz --compression 9</pre>
+                    </div>
+
+                    <div class="warning">
+                        <strong>Внимание:</strong> Высокие уровни сжатия (7-9) значительно увеличивают время сборки.
+                    </div>
+                </section>
+
+                <section id="troubleshooting">
+                    <h2>Решение проблем</h2>
+
+                    <h3>Частые проблемы</h3>
+
+                    <h4>Ошибка "command not found"</h4>
+                    <p>Убедитесь, что Criage установлен в PATH:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Проверить PATH
+echo $PATH
+
+# Добавить в ~/.bashrc или ~/.zshrc
+export PATH=$PATH:/usr/local/bin</pre>
+                    </div>
+
+                    <h4>Проблемы с правами доступа</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Установить права на исполнение
+chmod +x /usr/local/bin/criage
+
+# Или установить в домашнюю директорию
+mkdir -p ~/bin
+mv criage ~/bin/
+export PATH=$PATH:~/bin</pre>
+                    </div>
+
+                    <h4>Ошибки сети при работе с репозиториями</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Проверить доступность репозитория
+criage repo check
+
+# Увеличить таймаут
+criage config set repository.timeout 30</pre>
+                    </div>
+
+                    <h3>Отладка</h3>
+                    <p>Для получения подробной информации используйте флаг verbose:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre>criage install package-name --verbose</pre>
+                    </div>
+
+                    <h3>Получение помощи</h3>
+                    <ul>
+                        <li>Используйте <code class="inline-code">criage --help</code> для общей справки</li>
+                        <li>Используйте <code class="inline-code">criage [command] --help</code> для справки по
+                            конкретной команде</li>
+                        <li>Создайте issue на <a href="https://github.com/Zu-Krein/criage/issues"
+                                target="_blank">GitHub</a></li>
+                    </ul>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Функция копирования в буфер обмена
+        function copyToClipboard(btn) {
+            const codeBlock = btn.parentElement;
+            const pre = codeBlock.querySelector('pre');
+            const text = pre.textContent.trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Скопировано!';
+                setTimeout(() => {
+                    btn.textContent = 'Копировать';
+                }, 2000);
+            });
+        }
+
+        // Активация ссылок в боковом меню при прокрутке
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Плавная прокрутка для ссылок
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
