@@ -14,8 +14,18 @@ var (
 )
 
 func main() {
-	// Инициализируем локализацию
+	// Инициализируем локализацию (автоматически выбирает embedded/внешние файлы)
 	l := pkg.GetLocalization()
+
+	// Показываем режим локализации в debug режиме
+	if os.Getenv("CRIAGE_DEBUG") == "1" {
+		embeddedLangs := pkg.GetEmbeddedLanguages()
+		if len(embeddedLangs) > 0 {
+			fmt.Printf("🚀 Используются встроенные переводы: %v\n", embeddedLangs)
+		} else {
+			fmt.Printf("📁 Используются внешние файлы переводов: %v\n", l.GetSupportedLanguages())
+		}
+	}
 
 	var rootCmd = &cobra.Command{
 		Use:     "criage",

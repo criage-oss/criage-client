@@ -17,6 +17,7 @@ type Localization struct {
 	supportedLanguages []string
 	translations       map[string]map[string]string
 	translationsDir    string
+	useEmbedded        bool
 	mutex              sync.RWMutex
 }
 
@@ -30,9 +31,22 @@ const DefaultLanguage = "en"
 // GetLocalization возвращает глобальный экземпляр локализации
 func GetLocalization() *Localization {
 	localizationOnce.Do(func() {
-		globalLocalization = NewLocalization()
+		// Автоматически выбираем режим локализации
+		embeddedLangs := GetEmbeddedLanguages()
+		if len(embeddedLangs) > 0 {
+			// Если есть встроенные языки, используем их
+			globalLocalization = NewEmbeddedLocalization()
+		} else {
+			// Иначе используем внешние файлы
+			globalLocalization = NewLocalization()
+		}
 	})
 	return globalLocalization
+}
+
+// SetGlobalLocalization устанавливает глобальный экземпляр локализации
+func SetGlobalLocalization(localization *Localization) {
+	globalLocalization = localization
 }
 
 // NewLocalization создает новый экземпляр локализации
@@ -313,4 +327,11 @@ func SetLanguage(language string) error {
 
 func GetLanguage() string {
 	return GetLocalization().GetLanguage()
+}
+
+// IsEmbedded возвращает true, если используются встроенные переводы
+func (l *Localization) IsEmbedded() bool {
+	l.mutex.RLock()
+	defer l.mutex.RUnlock()
+	return l.useEmbedded
 }

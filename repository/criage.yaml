@@ -1,0 +1,52 @@
+name: criage-repository
+version: 1.0.0
+description: "Criage Repository Server - сервер репозитория с поддержкой встроенной локализации"
+author: "Criage Team"
+license: MIT
+homepage: "https://github.com/criage/criage/tree/main/repository"
+repository: "https://github.com/criage/criage"
+keywords:
+  - repository-server
+  - package-server
+  - web-api
+  - localization
+  - go
+dependencies: {}
+dev_dependencies: {}
+scripts:
+  build: "go build -o criage-repository ."
+  build-embedded: "go build -tags embed -o criage-repository-embedded ."
+  run: "./criage-repository"
+  test: "go test ./..."
+  clean: "rm -f criage-repository criage-repository-embedded"
+files:
+  - "*"
+exclude:
+  - .git
+  - .gitignore
+  - "*.log"
+  - "*.tmp"
+  - packages/
+  - "repository-*"
+arch:
+  - amd64
+  - arm64
+  - 386
+os:
+  - linux
+  - darwin
+  - windows
+min_version: 1.0.0
+hooks:
+  pre_build:
+    - "echo 'Preparing Criage repository server build...'"
+    - "go mod tidy"
+  post_build:
+    - "echo 'Criage repository server build completed successfully!'"
+    - "ls -la criage-repository*"
+metadata:
+  category: "server"
+  tags: ["server", "api", "repository", "web"]
+  documentation: "README.md"
+  port: 8080
+  ssl_support: true

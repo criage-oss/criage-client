@@ -1,0 +1,78 @@
+{
+    "name": "criage",
+    "version": "1.0.0",
+    "description": "Criage package manager with embedded localization support",
+    "build_script": "go build -tags embed -ldflags \"-s -w -X main.version=1.0.0\" -o criage-embedded.exe .",
+    "build_env": {
+        "CGO_ENABLED": "0",
+        "GOOS": "linux",
+        "GOARCH": "amd64"
+    },
+    "output_dir": "./build",
+    "include_files": [
+        "criage-embedded.exe",
+        "README.md",
+        "README_ru.md",
+        "LICENSE",
+        "EMBEDDED_LOCALIZATION.md",
+        "EMBEDDED_DEMO.md",
+        "criage.yaml"
+    ],
+    "exclude_files": [
+        "build.json",
+        "*.log",
+        "*.tmp",
+        ".git",
+        "test/",
+        "docs/",
+        "criage_modules/",
+        "repository/",
+        "test-package/"
+    ],
+    "compression": {
+        "format": "tar.zst",
+        "level": 6
+    },
+    "targets": [
+        {
+            "os": "linux",
+            "arch": "amd64",
+            "env": {
+                "GOOS": "linux",
+                "GOARCH": "amd64"
+            }
+        },
+        {
+            "os": "linux",
+            "arch": "arm64",
+            "env": {
+                "GOOS": "linux",
+                "GOARCH": "arm64"
+            }
+        },
+        {
+            "os": "windows",
+            "arch": "amd64",
+            "env": {
+                "GOOS": "windows",
+                "GOARCH": "amd64"
+            }
+        },
+        {
+            "os": "darwin",
+            "arch": "amd64",
+            "env": {
+                "GOOS": "darwin",
+                "GOARCH": "amd64"
+            }
+        },
+        {
+            "os": "darwin",
+            "arch": "arm64",
+            "env": {
+                "GOOS": "darwin",
+                "GOARCH": "arm64"
+            }
+        }
+    ]
+}

@@ -9,6 +9,19 @@ import (
 )
 
 func main() {
+	// Инициализируем локализацию repository (автоматически выбирает embedded/внешние файлы)
+	l := GetLocalization()
+
+	// Показываем режим локализации в debug режиме
+	if os.Getenv("CRIAGE_DEBUG") == "1" {
+		embeddedLangs := GetEmbeddedRepositoryLanguages()
+		if len(embeddedLangs) > 0 {
+			log.Printf("🚀 Repository: используются встроенные переводы: %v", embeddedLangs)
+		} else {
+			log.Printf("📁 Repository: используются внешние файлы переводов: %v", l.GetSupportedLanguages())
+		}
+	}
+
 	// Параметры командной строки
 	configPath := flag.String("config", "config.json", "Path to configuration file")
 	flag.Parse()
