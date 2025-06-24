@@ -8,9 +8,9 @@ require (
 )
 
 require (
-	github.com/klauspost/compress v1.17.4 // indirect
-	github.com/pierrec/lz4/v4 v4.1.19 // indirect
-	github.com/ulikunitz/xz v0.5.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/pierrec/lz4/v4 v4.1.22 // indirect
+	github.com/ulikunitz/xz v0.5.12 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

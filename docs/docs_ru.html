@@ -345,6 +345,7 @@
                     <li><a href="#development">Разработка пакетов</a></li>
                     <li><a href="#repositories">Репозитории</a></li>
                     <li><a href="#configuration">Конфигурация</a></li>
+                    <li><a href="#localization">Локализация</a></li>
                     <li><a href="#formats">Форматы сжатия</a></li>
                     <li><a href="#troubleshooting">Решение проблем</a></li>
                 </ul>
@@ -626,6 +627,128 @@ criage build --format tar.xz --compression 9</pre>
 
                     <div class="warning">
                         <strong>Внимание:</strong> Высокие уровни сжатия (7-9) значительно увеличивают время сборки.
+                    </div>
+                </section>
+
+                <section id="localization">
+                    <h2>🌍 Локализация</h2>
+
+                    <p>Criage оснащен динамической системой локализации, которая поддерживает несколько языков без
+                        необходимости изменения кода. Система автоматически определяет доступные языки и предоставляет
+                        простой способ добавления новых локализаций.</p>
+
+                    <h3>Поддерживаемые языки</h3>
+                    <ul>
+                        <li>🇬🇧 Английский (en) - По умолчанию</li>
+                        <li>🇷🇺 Русский (ru)</li>
+                        <li>🇩🇪 Немецкий (de)</li>
+                        <li>🇪🇸 Испанский (es)</li>
+                    </ul>
+
+                    <h3>Установка языка</h3>
+                    <p>Criage автоматически определяет язык вашей системы. Вы также можете установить его вручную с
+                        помощью переменных окружения:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Установить язык для текущей сессии
+export LANG=de_DE.UTF-8
+criage --help
+
+# Или использовать переменную LANGUAGE
+export LANGUAGE=es
+criage install package-name</pre>
+                    </div>
+
+                    <h3>Добавление новых языков</h3>
+                    <p>Добавление поддержки нового языка простое:</p>
+
+                    <div class="example">
+                        <strong>Пример: Добавление поддержки французского языка</strong>
+                        <ol>
+                            <li>Создать <code class="inline-code">locale/translations_fr.json</code></li>
+                            <li>Создать <code class="inline-code">repository/locale/translations_fr.json</code></li>
+                            <li>Перезапустить приложение</li>
+                        </ol>
+                    </div>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Копировать</button>
+                        <pre># Пример файла французских переводов
+{
+  "app_description": "Gestionnaire de paquets haute performance",
+  "cmd_install": "Installer un paquet",
+  "cmd_search": "Rechercher des paquets",
+  "installing_package": "Installation du paquet %s...",
+  "packages_found": "%d paquets trouvés:"
+}</pre>
+                    </div>
+
+                    <h3>Покрытие языков</h3>
+                    <table style="width: 100%; margin: 1rem 0; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--surface);">
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: left;">Язык</th>
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: center;">Код</th>
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: center;">Основное
+                                    приложение</th>
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    Репозиторий</th>
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: center;">Статус
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid var(--border); padding: 8px;">Английский</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    <code>en</code>
+                                </td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td
+                                    style="border: 1px solid var(--border); padding: 8px; text-align: center; color: var(--success-color);">
+                                    Завершено</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--border); padding: 8px;">Русский</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    <code>ru</code>
+                                </td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td
+                                    style="border: 1px solid var(--border); padding: 8px; text-align: center; color: var(--success-color);">
+                                    Завершено</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--border); padding: 8px;">Немецкий</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    <code>de</code>
+                                </td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td
+                                    style="border: 1px solid var(--border); padding: 8px; text-align: center; color: var(--success-color);">
+                                    Завершено</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--border); padding: 8px;">Испанский</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    <code>es</code>
+                                </td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">⚠️</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td
+                                    style="border: 1px solid var(--border); padding: 8px; text-align: center; color: #f59e0b;">
+                                    Частично</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="note">
+                        <strong>Вклад в проект:</strong> Помогите нам улучшить локализацию Criage! Смотрите наше <a
+                            href="../LOCALIZATION.md" target="_blank">подробное руководство по локализации</a> для
+                        получения полных инструкций по добавлению новых языков или улучшению существующих переводов.
                     </div>
                 </section>
 

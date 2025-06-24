@@ -345,6 +345,7 @@
                     <li><a href="#development">Package Development</a></li>
                     <li><a href="#repositories">Repositories</a></li>
                     <li><a href="#configuration">Configuration</a></li>
+                    <li><a href="#localization">Localization</a></li>
                     <li><a href="#formats">Compression Formats</a></li>
                     <li><a href="#troubleshooting">Troubleshooting</a></li>
                 </ul>
@@ -624,6 +625,129 @@ criage build --format tar.xz --compression 9</pre>
 
                     <div class="warning">
                         <strong>Warning:</strong> High compression levels (7-9) significantly increase build time.
+                    </div>
+                </section>
+
+                <section id="localization">
+                    <h2>🌍 Localization</h2>
+
+                    <p>Criage features a dynamic localization system that supports multiple languages without requiring
+                        code modifications. The system automatically detects available languages and provides an easy
+                        way to add new localizations.</p>
+
+                    <h3>Supported Languages</h3>
+                    <ul>
+                        <li>🇬🇧 English (en) - Default</li>
+                        <li>🇷🇺 Russian (ru)</li>
+                        <li>🇩🇪 German (de)</li>
+                        <li>🇪🇸 Spanish (es)</li>
+                    </ul>
+
+                    <h3>Setting Language</h3>
+                    <p>Criage automatically detects your system language. You can also set it manually using environment
+                        variables:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre># Set language for current session
+export LANG=de_DE.UTF-8
+criage --help
+
+# Or use LANGUAGE variable
+export LANGUAGE=es
+criage install package-name</pre>
+                    </div>
+
+                    <h3>Adding New Languages</h3>
+                    <p>Adding support for a new language is simple:</p>
+
+                    <div class="example">
+                        <strong>Example: Adding French support</strong>
+                        <ol>
+                            <li>Create <code class="inline-code">locale/translations_fr.json</code></li>
+                            <li>Create <code class="inline-code">repository/locale/translations_fr.json</code></li>
+                            <li>Restart the application</li>
+                        </ol>
+                    </div>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre># Example French translation file
+{
+  "app_description": "Gestionnaire de paquets haute performance",
+  "cmd_install": "Installer un paquet",
+  "cmd_search": "Rechercher des paquets",
+  "installing_package": "Installation du paquet %s...",
+  "packages_found": "%d paquets trouvés:"
+}</pre>
+                    </div>
+
+                    <h3>Language Coverage</h3>
+                    <table style="width: 100%; margin: 1rem 0; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--surface);">
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: left;">Language
+                                </th>
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: center;">Code</th>
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: center;">Main App
+                                </th>
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    Repository</th>
+                                <th style="border: 1px solid var(--border); padding: 8px; text-align: center;">Status
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border: 1px solid var(--border); padding: 8px;">English</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    <code>en</code>
+                                </td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td
+                                    style="border: 1px solid var(--border); padding: 8px; text-align: center; color: var(--success-color);">
+                                    Complete</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--border); padding: 8px;">Russian</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    <code>ru</code>
+                                </td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td
+                                    style="border: 1px solid var(--border); padding: 8px; text-align: center; color: var(--success-color);">
+                                    Complete</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--border); padding: 8px;">German</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    <code>de</code>
+                                </td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td
+                                    style="border: 1px solid var(--border); padding: 8px; text-align: center; color: var(--success-color);">
+                                    Complete</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid var(--border); padding: 8px;">Spanish</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">
+                                    <code>es</code>
+                                </td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">⚠️</td>
+                                <td style="border: 1px solid var(--border); padding: 8px; text-align: center;">✅</td>
+                                <td
+                                    style="border: 1px solid var(--border); padding: 8px; text-align: center; color: #f59e0b;">
+                                    Partial</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="note">
+                        <strong>Contributing:</strong> Help us improve Criage's localization! See our <a
+                            href="../LOCALIZATION_EN.md" target="_blank">detailed localization guide</a> for complete
+                        instructions on adding new languages or improving existing translations.
                     </div>
                 </section>
 

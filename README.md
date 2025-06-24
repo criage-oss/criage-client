@@ -18,6 +18,7 @@
 - 🌐 **Multiple Repositories** - support for multiple package sources
 - 🎯 **Cross-Platform** - supports Linux, macOS, Windows
 - ⚡ **Parallel Operations** - multithreaded processing for acceleration
+- 🌍 **Multilingual Support** - dynamic localization system - see [Localization Guide](LOCALIZATION_EN.md)
 
 ### Package Management
 

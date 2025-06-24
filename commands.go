@@ -15,7 +15,7 @@ func init() {
 	var err error
 	packageManager, err = pkg.NewPackageManager()
 	if err != nil {
-		fmt.Printf("Ошибка инициализации пакетного менеджера: %v\n", err)
+		fmt.Printf(pkg.T("error_init_package_manager", err))
 		os.Exit(1)
 	}
 }
@@ -42,9 +42,9 @@ func updateAllPackages() error {
 		return err
 	}
 
-	for _, pkg := range packages {
-		if err := packageManager.UpdatePackage(pkg.Name); err != nil {
-			fmt.Printf("Не удалось обновить %s: %v\n", pkg.Name, err)
+	for _, packageInfo := range packages {
+		if err := packageManager.UpdatePackage(packageInfo.Name); err != nil {
+			fmt.Printf(pkg.T("failed_to_update", packageInfo.Name, err))
 		}
 	}
 	return nil
@@ -57,7 +57,7 @@ func searchPackages(query string) error {
 		return err
 	}
 
-	fmt.Printf("Найдено %d пакетов:\n", len(results))
+	fmt.Printf(pkg.T("packages_found", len(results)))
 	for _, result := range results {
 		fmt.Printf("- %s (%s): %s\n", result.Name, result.Version, result.Description)
 	}
@@ -71,7 +71,7 @@ func listPackages() error {
 		return err
 	}
 
-	fmt.Printf("Установлено %d пакетов:\n", len(packages))
+	fmt.Printf(pkg.T("packages_installed", len(packages)))
 	for _, pkg := range packages {
 		fmt.Printf("- %s (%s)\n", pkg.Name, pkg.Version)
 	}
@@ -85,12 +85,12 @@ func showPackageInfo(packageName string) error {
 		return err
 	}
 
-	fmt.Printf("Название: %s\n", info.Name)
-	fmt.Printf("Версия: %s\n", info.Version)
-	fmt.Printf("Описание: %s\n", info.Description)
-	fmt.Printf("Автор: %s\n", info.Author)
-	fmt.Printf("Установлен: %s\n", info.InstallDate.Format("2006-01-02 15:04:05"))
-	fmt.Printf("Размер: %d байт\n", info.Size)
+	fmt.Printf("%s: %s\n", pkg.T("package_name"), info.Name)
+	fmt.Printf("%s: %s\n", pkg.T("package_version"), info.Version)
+	fmt.Printf("%s: %s\n", pkg.T("package_description"), info.Description)
+	fmt.Printf("%s: %s\n", pkg.T("package_author"), info.Author)
+	fmt.Printf("%s: %s\n", pkg.T("package_installed_date"), info.InstallDate.Format("2006-01-02 15:04:05"))
+	fmt.Printf("%s: %d байт\n", pkg.T("package_size"), info.Size)
 	return nil
 }
 
@@ -118,20 +118,20 @@ func showArchiveMetadata(archivePath string) error {
 		return fmt.Errorf("failed to extract metadata: %w", err)
 	}
 
-	fmt.Printf("=== Метаданные архива %s ===\n", archivePath)
-	fmt.Printf("Тип сжатия: %s\n", metadata.CompressionType)
-	fmt.Printf("Создан: %s\n", metadata.CreatedAt)
-	fmt.Printf("Создано с помощью: %s\n", metadata.CreatedBy)
+	fmt.Printf(pkg.T("archive_metadata_title", archivePath))
+	fmt.Printf("%s: %s\n", pkg.T("compression_type"), metadata.CompressionType)
+	fmt.Printf("%s: %s\n", pkg.T("created_at"), metadata.CreatedAt)
+	fmt.Printf("%s: %s\n", pkg.T("created_by"), metadata.CreatedBy)
 
 	if metadata.PackageManifest != nil {
-		fmt.Printf("\n=== Манифест пакета ===\n")
-		fmt.Printf("Название: %s\n", metadata.PackageManifest.Name)
-		fmt.Printf("Версия: %s\n", metadata.PackageManifest.Version)
-		fmt.Printf("Описание: %s\n", metadata.PackageManifest.Description)
-		fmt.Printf("Автор: %s\n", metadata.PackageManifest.Author)
-		fmt.Printf("Лицензия: %s\n", metadata.PackageManifest.License)
+		fmt.Printf("\n%s\n", pkg.T("package_manifest_title"))
+		fmt.Printf("%s: %s\n", pkg.T("package_name"), metadata.PackageManifest.Name)
+		fmt.Printf("%s: %s\n", pkg.T("package_version"), metadata.PackageManifest.Version)
+		fmt.Printf("%s: %s\n", pkg.T("package_description"), metadata.PackageManifest.Description)
+		fmt.Printf("%s: %s\n", pkg.T("package_author"), metadata.PackageManifest.Author)
+		fmt.Printf("%s: %s\n", pkg.T("package_license"), metadata.PackageManifest.License)
 		if len(metadata.PackageManifest.Dependencies) > 0 {
-			fmt.Printf("Зависимости:\n")
+			fmt.Printf("%s:\n", pkg.T("package_dependencies"))
 			for name, version := range metadata.PackageManifest.Dependencies {
 				fmt.Printf("  - %s: %s\n", name, version)
 			}
@@ -139,14 +139,14 @@ func showArchiveMetadata(archivePath string) error {
 	}
 
 	if metadata.BuildManifest != nil {
-		fmt.Printf("\n=== Манифест сборки ===\n")
-		fmt.Printf("Скрипт сборки: %s\n", metadata.BuildManifest.BuildScript)
-		fmt.Printf("Выходная директория: %s\n", metadata.BuildManifest.OutputDir)
-		fmt.Printf("Формат сжатия: %s (уровень %d)\n",
+		fmt.Printf("\n%s\n", pkg.T("build_manifest_title"))
+		fmt.Printf("%s: %s\n", pkg.T("build_script"), metadata.BuildManifest.BuildScript)
+		fmt.Printf("%s: %s\n", pkg.T("output_dir"), metadata.BuildManifest.OutputDir)
+		fmt.Printf("%s: %s (уровень %d)\n", pkg.T("compression_format"),
 			metadata.BuildManifest.Compression.Format,
 			metadata.BuildManifest.Compression.Level)
 		if len(metadata.BuildManifest.Targets) > 0 {
-			fmt.Printf("Целевые платформы:\n")
+			fmt.Printf("%s:\n", pkg.T("target_platforms"))
 			for _, target := range metadata.BuildManifest.Targets {
 				fmt.Printf("  - %s/%s\n", target.OS, target.Arch)
 			}
@@ -158,21 +158,21 @@ func showArchiveMetadata(archivePath string) error {
 
 // setConfig устанавливает значение конфигурации
 func setConfig(key, value string) error {
-	fmt.Printf("Установка конфигурации %s = %s\n", key, value)
+	fmt.Printf(pkg.T("config_set", key, value))
 	// Здесь будет реализация установки конфигурации
 	return nil
 }
 
 // getConfig получает значение конфигурации
 func getConfig(key string) error {
-	fmt.Printf("Получение значения конфигурации для ключа: %s\n", key)
+	fmt.Printf(pkg.T("config_get", key))
 	// Здесь будет реализация получения конфигурации
 	return nil
 }
 
 // listConfig показывает все настройки
 func listConfig() error {
-	fmt.Println("Список всех настроек конфигурации:")
+	fmt.Println(pkg.T("config_list"))
 	// Здесь будет реализация показа всех настроек
 	return nil
 }

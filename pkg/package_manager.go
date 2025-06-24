@@ -68,13 +68,13 @@ func NewPackageManager() (*PackageManager, error) {
 
 // InstallPackage устанавливает пакет
 func (pm *PackageManager) InstallPackage(packageName, version string, global, force, dev bool, arch, osName string) error {
-	fmt.Printf("Установка пакета %s...\n", packageName)
+	fmt.Printf(T("installing_package", packageName))
 
 	// Проверяем, не установлен ли уже пакет
 	if !force {
 		if info, exists := pm.getInstalledPackage(packageName); exists {
 			if version == "" || info.Version == version {
-				fmt.Printf("Пакет %s уже установлен (версия %s)\n", packageName, info.Version)
+				fmt.Printf(T("package_already_installed", packageName, info.Version))
 				return nil
 			}
 		}
@@ -91,13 +91,13 @@ func (pm *PackageManager) InstallPackage(packageName, version string, global, fo
 	// Поиск пакета в репозиториях
 	packageInfo, downloadURL, err := pm.findPackage(packageName, version, arch, osName)
 	if err != nil {
-		return fmt.Errorf("failed to find package: %w", err)
+		return fmt.Errorf(T("error_failed_to_find"), err)
 	}
 
 	// Скачиваем пакет
 	archivePath, err := pm.downloadPackage(downloadURL, packageName, packageInfo.Version)
 	if err != nil {
-		return fmt.Errorf("failed to download package: %w", err)
+		return fmt.Errorf(T("error_failed_to_download"), err)
 	}
 	defer os.Remove(archivePath)
 
@@ -107,23 +107,23 @@ func (pm *PackageManager) InstallPackage(packageName, version string, global, fo
 
 	format := pm.archiveManager.DetectFormat(archivePath)
 	if err := pm.archiveManager.ExtractArchive(archivePath, tempDir, format); err != nil {
-		return fmt.Errorf("failed to extract archive: %w", err)
+		return fmt.Errorf(T("error_failed_to_extract"), err)
 	}
 
 	// Загружаем манифест пакета
 	manifest, err := pm.loadManifestFromDir(tempDir)
 	if err != nil {
-		return fmt.Errorf("failed to load package manifest: %w", err)
+		return fmt.Errorf(T("error_failed_to_load"), err)
 	}
 
 	// Проверяем зависимости
 	if err := pm.checkDependencies(manifest, dev); err != nil {
-		return fmt.Errorf("dependency check failed: %w", err)
+		return fmt.Errorf(T("error_dependency_check"), err)
 	}
 
 	// Выполняем пре-установочные хуки
 	if err := pm.executeHooks(manifest.Hooks, manifest.Hooks.PreInstall, tempDir); err != nil {
-		return fmt.Errorf("pre-install hooks failed: %w", err)
+		return fmt.Errorf(T("error_pre_install_hooks"), err)
 	}
 
 	// Определяем путь установки
@@ -132,18 +132,18 @@ func (pm *PackageManager) InstallPackage(packageName, version string, global, fo
 	// Удаляем старую версию, если она есть
 	if force {
 		if err := os.RemoveAll(installPath); err != nil {
-			return fmt.Errorf("failed to remove old version: %w", err)
+			return fmt.Errorf(T("error_failed_to_remove"), err)
 		}
 	}
 
 	// Создаем директорию установки
 	if err := os.MkdirAll(installPath, 0755); err != nil {
-		return fmt.Errorf("failed to create install directory: %w", err)
+		return fmt.Errorf(T("error_failed_to_create"), err)
 	}
 
 	// Копируем файлы
 	if err := pm.copyFiles(tempDir, installPath, manifest.Files); err != nil {
-		return fmt.Errorf("failed to copy files: %w", err)
+		return fmt.Errorf(T("error_failed_to_copy"), err)
 	}
 
 	// Создаем информацию о пакете
@@ -163,7 +163,7 @@ func (pm *PackageManager) InstallPackage(packageName, version string, global, fo
 
 	// Сохраняем информацию о пакете
 	if err := pm.savePackageInfo(packageInfo); err != nil {
-		return fmt.Errorf("failed to save package info: %w", err)
+		return fmt.Errorf(T("error_failed_to_save"), err)
 	}
 
 	// Обновляем кеш установленных пакетов
@@ -173,44 +173,44 @@ func (pm *PackageManager) InstallPackage(packageName, version string, global, fo
 
 	// Выполняем пост-установочные хуки
 	if err := pm.executeHooks(manifest.Hooks, manifest.Hooks.PostInstall, installPath); err != nil {
-		fmt.Printf("Предупреждение: post-install hooks failed: %v\n", err)
+		fmt.Printf(T("error_post_install_hooks", err))
 	}
 
-	fmt.Printf("Пакет %s версии %s успешно установлен\n", packageName, packageInfo.Version)
+	fmt.Printf(T("package_installed", packageName, packageInfo.Version))
 	return nil
 }
 
 // UninstallPackage удаляет пакет
 func (pm *PackageManager) UninstallPackage(packageName string, global, purge bool) error {
-	fmt.Printf("Удаление пакета %s...\n", packageName)
+	fmt.Printf(T("uninstalling_package", packageName))
 
 	// Проверяем, установлен ли пакет
 	packageInfo, exists := pm.getInstalledPackage(packageName)
 	if !exists {
-		return fmt.Errorf("package not installed: %s", packageName)
+		return fmt.Errorf(T("package_not_installed", packageName))
 	}
 
 	// Загружаем манифест
 	manifest, err := pm.loadManifestFromDir(packageInfo.InstallPath)
 	if err != nil {
-		fmt.Printf("Предупреждение: failed to load manifest: %v\n", err)
+		fmt.Printf(T("warning_failed_to_load", err))
 	}
 
 	// Выполняем пре-удаление хуки
 	if manifest != nil && manifest.Hooks != nil {
 		if err := pm.executeHooks(manifest.Hooks, manifest.Hooks.PreRemove, packageInfo.InstallPath); err != nil {
-			fmt.Printf("Предупреждение: pre-remove hooks failed: %v\n", err)
+			fmt.Printf(T("warning_pre_remove_hooks", err))
 		}
 	}
 
 	// Удаляем файлы пакета
 	if err := os.RemoveAll(packageInfo.InstallPath); err != nil {
-		return fmt.Errorf("failed to remove package files: %w", err)
+		return fmt.Errorf(T("error_failed_to_remove"), err)
 	}
 
 	// Удаляем информацию о пакете
 	if err := pm.removePackageInfo(packageName); err != nil {
-		return fmt.Errorf("failed to remove package info: %w", err)
+		return fmt.Errorf(T("error_failed_to_remove"), err)
 	}
 
 	// Обновляем кеш
@@ -221,11 +221,11 @@ func (pm *PackageManager) UninstallPackage(packageName string, global, purge boo
 	// Выполняем пост-удаление хуки
 	if manifest != nil && manifest.Hooks != nil {
 		if err := pm.executeHooks(manifest.Hooks, manifest.Hooks.PostRemove, ""); err != nil {
-			fmt.Printf("Предупреждение: post-remove hooks failed: %v\n", err)
+			fmt.Printf(T("warning_post_remove_hooks", err))
 		}
 	}
 
-	fmt.Printf("Пакет %s успешно удален\n", packageName)
+	fmt.Printf(T("package_uninstalled", packageName))
 	return nil
 }
 
