@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Server - Criage</title>
+    <meta name="description" content="Criage MCP Server documentation for integration with AI tools">
+    <link rel="icon" type="image/png" href="../logo.png">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #64748b;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --background: #ffffff;
+            --surface: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--background);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .lang-btn:hover,
+        .lang-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Main layout */
+        .docs-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.5rem;
+            display: block;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Content */
+        .docs-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .docs-content h1 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+
+        .docs-content h2 {
+            color: var(--text-primary);
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            font-size: 1.8rem;
+        }
+
+        .docs-content h3 {
+            color: var(--text-primary);
+            margin: 1.5rem 0 0.75rem 0;
+            font-size: 1.3rem;
+        }
+
+        .docs-content h4 {
+            color: var(--text-primary);
+            margin: 1rem 0 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .docs-content p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .docs-content ul,
+        .docs-content ol {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+        }
+
+        .docs-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-block pre {
+            background: none;
+            padding: 1rem;
+            margin: 0;
+            overflow-x: auto;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .inline-code {
+            background: #f1f5f9;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--primary-color);
+        }
+
+        /* Alert boxes */
+        .note {
+            background: #eff6ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .warning {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .example {
+            background: #f0fdf4;
+            border-left: 4px solid var(--success-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .feature-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-card li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feature-card li:last-child {
+            border-bottom: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .docs-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .nav-content {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <nav class="container">
+            <a href="index.html" class="logo">
+                <img src="logo.png" alt="Criage Logo">
+                Criage
+            </a>
+            <div class="nav-content">
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="docs.html">Documentation</a></li>
+                    <li><a href="mcp-server.html">MCP Server</a></li>
+                    <li><a href="https://github.com/Zu-Krein/criage" target="_blank">GitHub</a></li>
+                </ul>
+                <div class="language-switcher">
+                    <a href="mcp-server.html" class="lang-btn active">EN</a>
+                    <a href="mcp-server_ru.html" class="lang-btn">RU</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="docs-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <h3>Table of Contents</h3>
+                <ul class="sidebar-nav">
+                    <li><a href="#overview" class="active">Overview</a></li>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#integration">Integration</a></li>
+                    <li><a href="#tools">Tools</a></li>
+                    <li><a href="#examples">Examples</a></li>
+                    <li><a href="#configuration">Configuration</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                </ul>
+            </aside>
+
+            <!-- Content -->
+            <main class="docs-content">
+                <h1>🤖 Criage MCP Server</h1>
+                <p>Documentation for the MCP server for integrating Criage with AI tools via the Model Context
+                    Protocol.</p>
+
+                <section id="overview">
+                    <h2>Overview</h2>
+
+                    <p>Criage MCP Server provides full package manager functionality via the MCP (Model
+                        Context Protocol) for integration with AI tools.</p>
+
+                    <h3>What is MCP Server?</h3>
+                    <p>MCP Server allows AI assistants to directly interact with Criage for:</p>
+                    <ul>
+                        <li>🔍 <strong>Package search and installation</strong> - AI can find suitable packages and
+                            install them</li>
+                        <li>📦 <strong>Dependency management</strong> - automatic conflict resolution and updates</li>
+                        <li>🆕 <strong>Creating new packages</strong> - structure generation and manifest setup</li>
+                        <li>🔨 <strong>Building and publishing packages</strong> - automating the release process</li>
+                        <li>📊 <strong>Information retrieval</strong> - analyzing package and repository status</li>
+                    </ul>
+
+                    <h3>Benefits of AI Integration</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>🎯 Intelligent Search</h4>
+                            <p>AI understands your needs and finds suitable packages even from vague descriptions.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>⚡ Automation of Routine</h4>
+                            <p>Automatic execution of common operations: installation, updates, project creation.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🔧 Smart Configuration</h4>
+                            <p>AI helps with configuration and solving compatibility issues.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="installation">
+                    <h2>Installation</h2>
+
+                    <h3>Requirements</h3>
+                    <ul>
+                        <li>Go 1.21 or higher</li>
+                        <li>Installed Criage</li>
+                        <li>Claude Desktop or other MCP client</li>
+                    </ul>
+
+                    <h3>Building the Server</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre># Navigate to mcp-server directory
+cd mcp-server
+
+# Install dependencies
+go mod tidy
+
+# Build the server
+go build -o criage-mcp-server.exe .</pre>
+                    </div>
+
+                    <div class="note">
+                        <strong>Note:</strong> On Windows use the <code class="inline-code">.exe</code> extension, on
+                        Linux/macOS you can omit the extension.
+                    </div>
+                </section>
+
+                <section id="integration">
+                    <h2>Integration with Claude Desktop</h2>
+
+                    <h3>Configuration Setup</h3>
+                    <p>Add the MCP Server to Claude Desktop configuration:</p>
+
+                    <h4>Windows</h4>
+                    <p>Edit the file <code class="inline-code">%APPDATA%\Claude\config.json</code>:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre>{
+  "mcpServers": {
+    "criage": {
+      "command": "C:\\path\\to\\criage-mcp-server.exe",
+      "args": [],
+      "env": {}
+    }
+  }
+}</pre>
+                    </div>
+
+                    <h4>Linux/macOS</h4>
+                    <p>Edit the file <code class="inline-code">~/.config/claude-desktop/config.json</code>:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre>{
+  "mcpServers": {
+    "criage": {
+      "command": "/path/to/criage-mcp-server",
+      "args": [],
+      "env": {}
+    }
+  }
+}</pre>
+                    </div>
+
+                    <h3>Verifying Integration</h3>
+                    <ol>
+                        <li>Restart Claude Desktop</li>
+                        <li>Criage tools should appear in a new chat</li>
+                        <li>Try the query: <em>"Show me available Criage tools"</em></li>
+                    </ol>
+
+                    <div class="example">
+                        <strong>Test:</strong> Send the message "Show all installed packages" in Claude Desktop.
+                        AI should use the <code class="inline-code">list_packages</code> tool and show the
+                        result.
+                    </div>
+                </section>
+
+                <section id="tools">
+                    <h2>Available Tools</h2>
+
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>📦 Package Management</h4>
+                            <ul>
+                                <li><code class="inline-code">install_package</code> - Install package from repository
+                                </li>
+                                <li><code class="inline-code">uninstall_package</code> - Remove installed package
+                                </li>
+                                <li><code class="inline-code">update_package</code> - Update package to latest version
+                                </li>
+                                <li><code class="inline-code">list_packages</code> - List all installed packages
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🔍 Search and Exploration</h4>
+                            <ul>
+                                <li><code class="inline-code">search_packages</code> - Search packages by keywords
+                                </li>
+                                <li><code class="inline-code">package_info</code> - Detailed package information</li>
+                                <li><code class="inline-code">repository_info</code> - Repository information</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🛠️ Development</h4>
+                            <ul>
+                                <li><code class="inline-code">create_package</code> - Create new package</li>
+                                <li><code class="inline-code">build_package</code> - Build package</li>
+                                <li><code class="inline-code">publish_package</code> - Publish package to repository
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Tool Parameters</h3>
+                    <p>Each tool accepts various parameters for precise operation configuration:</p>
+
+                    <h4>install_package</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre>{
+  "name": "package-name",        // Required: package name
+  "version": "1.2.3",           // Optional: specific version
+  "global": false,              // Optional: global installation
+  "force": false,               // Optional: force reinstallation
+  "arch": "amd64",             // Optional: target architecture
+  "os": "windows"              // Optional: target OS
+}</pre>
+                    </div>
+
+                    <h4>search_packages</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre>{
+  "query": "web framework",     // Required: search query
+  "limit": 10,                 // Optional: maximum results
+  "category": "web"            // Optional: filter by category
+}</pre>
+                    </div>
+                </section>
+
+                <section id="examples">
+                    <h2>Usage Examples</h2>
+
+                    <h3>Search and Install Package</h3>
+                    <div class="example">
+                        <strong>User query:</strong> <em>"Find a package for working with JSON and install
+                            it"</em><br><br>
+                        <strong>AI actions:</strong><br>
+                        1. Uses <code class="inline-code">search_packages</code> with query "JSON"<br>
+                        2. Analyzes results and selects suitable package<br>
+                        3. Uses <code class="inline-code">install_package</code> for installation<br>
+                        4. Confirms successful installation
+                    </div>
+
+                    <h3>Creating New Project</h3>
+                    <div class="example">
+                        <strong>User query:</strong> <em>"Create a new package for REST API client"</em><br><br>
+                        <strong>AI actions:</strong><br>
+                        1. Uses <code class="inline-code">create_package</code> with appropriate parameters<br>
+                        2. Configures manifest with description and dependencies<br>
+                        3. Suggests installing necessary packages for development<br>
+                        4. Explains the structure of the created project
+                    </div>
+
+                    <h3>Dependency Management</h3>
+                    <div class="example">
+                        <strong>User query:</strong> <em>"Show all outdated packages and update
+                            them"</em><br><br>
+                        <strong>AI actions:</strong><br>
+                        1. Uses <code class="inline-code">list_packages</code> with outdated filter<br>
+                        2. For each outdated package uses <code class="inline-code">update_package</code><br>
+                        3. Shows update results<br>
+                        4. Warns about possible conflicts
+                    </div>
+
+                    <h3>Repository Analysis</h3>
+                    <div class="example">
+                        <strong>User query:</strong> <em>"Show repository statistics and most popular
+                            packages"</em><br><br>
+                        <strong>AI actions:</strong><br>
+                        1. Uses <code class="inline-code">repository_info</code> to get statistics<br>
+                        2. Analyzes data about package count and authors<br>
+                        3. Shows top popular packages<br>
+                        4. Provides usage recommendations
+                    </div>
+                </section>
+
+                <section id="configuration">
+                    <h2>Configuration</h2>
+
+                    <h3>Automatic Configuration</h3>
+                    <p>MCP Server uses standard Criage configuration from <code
+                            class="inline-code">~/.criage/config.json</code>. On first run, default configuration is
+                        automatically created:</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre>{
+  "repositories": [
+    {
+      "name": "default",
+      "url": "http://localhost:8080", 
+      "priority": 1,
+      "enabled": true
+    }
+  ],
+  "global_path": "~/.criage/packages",
+  "local_path": "./criage_modules",
+  "cache_path": "~/.criage/cache",
+  "temp_path": "~/.criage/temp",
+  "timeout": 30,
+  "max_concurrency": 4,
+  "compression_level": 3,
+  "force_https": false
+}</pre>
+                    </div>
+
+                    <h3>Environment Variables</h3>
+                    <p>You can use environment variables to configure server behavior:</p>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre># Enable verbose logging
+set CRIAGE_DEBUG=1
+
+# Override config path
+set CRIAGE_CONFIG_PATH=C:\custom\config.json
+
+# Disable colors in output
+set NO_COLOR=1</pre>
+                    </div>
+
+                    <h3>Repository Configuration</h3>
+                    <p>If you're using a custom Criage repository, update the configuration:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre>{
+  "repositories": [
+    {
+      "name": "production",
+      "url": "https://packages.mycompany.com",
+      "priority": 10,
+      "enabled": true,
+      "token": "your-access-token"
+    },
+    {
+      "name": "development", 
+      "url": "https://dev-packages.mycompany.com",
+      "priority": 5,
+      "enabled": true
+    }
+  ]
+}</pre>
+                    </div>
+                </section>
+
+                <section id="troubleshooting">
+                    <h2>Troubleshooting</h2>
+
+                    <h3>Server Won't Start</h3>
+                    <div class="warning">
+                        <strong>Problem:</strong> MCP Server doesn't respond to Claude Desktop requests
+                    </div>
+                    <p><strong>Solutions:</strong></p>
+                    <ol>
+                        <li>Ensure Go is installed correctly: <code class="inline-code">go version</code></li>
+                        <li>Check executable file permissions</li>
+                        <li>Ensure <code class="inline-code">~/.criage</code> directory is writable
+                        </li>
+                        <li>Check the path in Claude Desktop configuration is correct</li>
+                    </ol>
+
+                    <h3>Tools Not Showing in Claude</h3>
+                    <div class="warning">
+                        <strong>Problem:</strong> Claude Desktop doesn't show Criage tools
+                    </div>
+                    <p><strong>Solutions:</strong></p>
+                    <ol>
+                        <li>Check JSON syntax in <code class="inline-code">config.json</code></li>
+                        <li>Restart Claude Desktop</li>
+                        <li>Ensure server path is specified correctly</li>
+                        <li>Check Claude Desktop logs for errors</li>
+                    </ol>
+
+                    <h3>Package Operation Errors</h3>
+                    <div class="warning">
+                        <strong>Problem:</strong> Package operations fail with errors
+                    </div>
+                    <p><strong>Solutions:</strong></p>
+                    <ol>
+                        <li>Check Criage repository availability</li>
+                        <li>Ensure repository configuration is correct</li>
+                        <li>Check access permissions to installation directories</li>
+                        <li>Enable debug mode: <code class="inline-code">set CRIAGE_DEBUG=1</code></li>
+                    </ol>
+
+                    <h3>Debugging and Logging</h3>
+                    <p>Enable verbose logging for problem diagnosis:</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre># Windows
+set CRIAGE_DEBUG=1
+criage-mcp-server.exe
+
+# Linux/macOS  
+export CRIAGE_DEBUG=1
+./criage-mcp-server</pre>
+                    </div>
+
+                    <h3>Compatibility Check</h3>
+                    <p>Ensure version compatibility:</p>
+                    <ul>
+                        <li>✅ <strong>Windows 10/11</strong> - full support</li>
+                        <li>✅ <strong>Ubuntu 20.04+</strong> - full support</li>
+                        <li>✅ <strong>macOS 10.15+</strong> - full support</li>
+                        <li>✅ <strong>Claude Desktop</strong> - primary client</li>
+                        <li>⚠️ <strong>Other MCP clients</strong> - basic support</li>
+                    </ul>
+
+                    <div class="note">
+                        <strong>Getting Help:</strong> If the problem persists, create an issue in the <a
+                            href="https://github.com/Zu-Krein/criage/issues" target="_blank">GitHub repository</a> with
+                        detailed problem description and debug logs.
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Copy to clipboard function
+        function copyToClipboard(btn) {
+            const codeBlock = btn.parentElement;
+            const pre = codeBlock.querySelector('pre');
+            const text = pre.textContent.trim();
+
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // Activate sidebar links on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scrolling for links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
