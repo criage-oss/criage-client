@@ -17,11 +17,13 @@ Navigation between languages is available through language switcher buttons in t
 
 - `index.html` - Main page with Criage capabilities overview
 - `docs.html` - Comprehensive usage documentation
+- `mcp_server_en.md` - MCP Server documentation for AI integration
 
 ### Russian
 
 - `index_ru.html` - Главная страница с обзором возможностей Criage
 - `docs_ru.html` - Подробная документация по использованию
+- `mcp_server_ru.md` - Документация MCP Server для интеграции с AI
 
 ### Common
 

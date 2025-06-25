@@ -289,6 +289,40 @@
             border-radius: 0 4px 4px 0;
         }
 
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .feature-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-card li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feature-card li:last-child {
+            border-bottom: none;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .docs-layout {
@@ -344,6 +378,7 @@
                     <li><a href="#package-management">Package Management</a></li>
                     <li><a href="#development">Package Development</a></li>
                     <li><a href="#repositories">Repositories</a></li>
+                    <li><a href="#mcp-server">MCP Server</a></li>
                     <li><a href="#configuration">Configuration</a></li>
                     <li><a href="#localization">Localization</a></li>
                     <li><a href="#formats">Compression Formats</a></li>
@@ -560,6 +595,125 @@ criage repo update</pre>
                     <div class="note">
                         <strong>Repository Priority:</strong> High priority (large number) means that packages from this
                         repository will be preferred during search.
+                    </div>
+                </section>
+
+                <section id="mcp-server">
+                    <h2>🤖 MCP Server</h2>
+
+                    <p>Criage MCP Server provides full package manager functionality through the MCP (Model Context
+                        Protocol) for integration with AI tools.</p>
+
+                    <h3>What is MCP Server?</h3>
+                    <p>MCP Server allows AI assistants to directly interact with Criage for:</p>
+                    <ul>
+                        <li>🔍 Searching and installing packages</li>
+                        <li>📦 Managing dependencies</li>
+                        <li>🆕 Creating new packages</li>
+                        <li>🔨 Building and publishing packages</li>
+                        <li>📊 Getting information about packages and repositories</li>
+                    </ul>
+
+                    <h3>MCP Server Installation</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre># Navigate to mcp-server directory
+cd mcp-server
+
+# Install dependencies
+go mod tidy
+
+# Build server
+go build -o criage-mcp-server .</pre>
+                    </div>
+
+                    <h3>Claude Desktop Integration</h3>
+                    <p>Add MCP Server to Claude Desktop configuration (<code
+                            class="inline-code">%APPDATA%\Claude\config.json</code> on Windows):</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre>{
+  "mcpServers": {
+    "criage": {
+      "command": "C:\\path\\to\\criage-mcp-server.exe",
+      "args": [],
+      "env": {}
+    }
+  }
+}</pre>
+                    </div>
+
+                    <h3>Available MCP Tools</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>📦 Package Management</h4>
+                            <ul>
+                                <li><code class="inline-code">install_package</code> - Install package</li>
+                                <li><code class="inline-code">uninstall_package</code> - Remove package</li>
+                                <li><code class="inline-code">update_package</code> - Update package</li>
+                                <li><code class="inline-code">list_packages</code> - List packages</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🔍 Search and Exploration</h4>
+                            <ul>
+                                <li><code class="inline-code">search_packages</code> - Search packages</li>
+                                <li><code class="inline-code">package_info</code> - Package information</li>
+                                <li><code class="inline-code">repository_info</code> - Repository information</li>
+                            </ul>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🛠️ Development</h4>
+                            <ul>
+                                <li><code class="inline-code">create_package</code> - Create package</li>
+                                <li><code class="inline-code">build_package</code> - Build package</li>
+                                <li><code class="inline-code">publish_package</code> - Publish package</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>AI Usage Examples</h3>
+                    <div class="example">
+                        <strong>Search and install web framework:</strong><br>
+                        <em>"Find a web framework package and install it"</em><br><br>
+                        AI will automatically:<br>
+                        1. Search packages with "web framework" keyword<br>
+                        2. Suggest suitable options<br>
+                        3. Install the selected package
+                    </div>
+
+                    <div class="example">
+                        <strong>Create new project:</strong><br>
+                        <em>"Create a new package for API work"</em><br><br>
+                        AI will execute:<br>
+                        1. Create package structure<br>
+                        2. Configure manifest<br>
+                        3. Add basic files
+                    </div>
+
+                    <h3>Server Configuration</h3>
+                    <p>MCP Server uses standard Criage configuration from <code
+                            class="inline-code">~/.criage/config.json</code>. Default configuration is automatically
+                        created on first run.</p>
+
+                    <h3>Logging and Debugging</h3>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyToClipboard(this)">Copy</button>
+                        <pre># Enable verbose logging
+set CRIAGE_DEBUG=1
+
+# Run server
+./criage-mcp-server</pre>
+                    </div>
+
+                    <div class="note">
+                        <strong>Compatibility:</strong> MCP Server is fully compatible with the main Criage client and
+                        supports all archive formats and operations.
+                    </div>
+
+                    <div class="warning">
+                        <strong>Security:</strong> MCP Server runs with full user privileges. Make sure you trust the AI
+                        system before providing access to package management.
                     </div>
                 </section>
 
