@@ -493,7 +493,7 @@ Criage is optimized for maximum performance:
 
 ### Requirements
 
-- Go 1.21 or higher
+- Go 1.24.4 or higher
 - Git
 
 ### Building from Source
