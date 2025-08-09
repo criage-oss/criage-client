@@ -14,6 +14,57 @@ import (
 	"time"
 )
 
+// RateLimiter простой rate limiter для HTTP запросов
+type RateLimiter struct {
+	ticker   *time.Ticker
+	requests chan struct{}
+}
+
+// NewRateLimiter создает новый rate limiter с заданной частотой запросов в секунду
+func NewRateLimiter(requestsPerSecond int) *RateLimiter {
+	if requestsPerSecond <= 0 {
+		requestsPerSecond = 10 // по умолчанию 10 запросов в секунду
+	}
+
+	interval := time.Second / time.Duration(requestsPerSecond)
+	ticker := time.NewTicker(interval)
+	requests := make(chan struct{}, requestsPerSecond)
+
+	// Заполняем буфер
+	for i := 0; i < requestsPerSecond; i++ {
+		requests <- struct{}{}
+	}
+
+	rl := &RateLimiter{
+		ticker:   ticker,
+		requests: requests,
+	}
+
+	// Запускаем горутину для пополнения буфера
+	go func() {
+		for range ticker.C {
+			select {
+			case requests <- struct{}{}:
+			default:
+				// Буфер полон, пропускаем
+			}
+		}
+	}()
+
+	return rl
+}
+
+// Wait ждет разрешения на выполнение запроса
+func (rl *RateLimiter) Wait() {
+	<-rl.requests
+}
+
+// Close останавливает rate limiter
+func (rl *RateLimiter) Close() {
+	rl.ticker.Stop()
+	close(rl.requests)
+}
+
 // PackageManager основной менеджер пакетов
 type PackageManager struct {
 	configManager     *ConfigManager
@@ -21,6 +72,7 @@ type PackageManager struct {
 	installedPackages map[string]*PackageInfo
 	packagesMutex     sync.RWMutex
 	httpClient        *http.Client
+	rateLimiter       *RateLimiter
 }
 
 // NewPackageManager создает новый пакетный менеджер
@@ -51,6 +103,7 @@ func NewPackageManager() (*PackageManager, error) {
 		archiveManager:    archiveManager,
 		installedPackages: make(map[string]*PackageInfo),
 		httpClient:        httpClient,
+		rateLimiter:       NewRateLimiter(5), // 5 запросов в секунду
 	}
 
 	// Создаем необходимые директории

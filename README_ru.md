@@ -41,7 +41,7 @@
 ### Из исходников
 
 ```bash
-git clone https://github.com/your-org/criage.git
+git clone https://github.com/criage-oss/criage.git
 cd criage
 go build -o criage
 sudo mv criage /usr/local/bin/
@@ -499,7 +499,7 @@ Criage оптимизирован для максимальной произво
 ### Сборка из исходников
 
 ```bash
-git clone https://github.com/your-org/criage.git
+git clone https://github.com/criage-oss/criage.git
 cd criage
 go mod tidy
 go build -o criage
@@ -537,7 +537,7 @@ Criage поддерживает создание собственных репо
 
 ```bash
 # Клонировать проект
-git clone https://github.com/Zu-Krein/criage.git
+git clone https://github.com/criage-oss/criage.git
 cd criage/repository
 
 # Собрать сервер репозитория
@@ -590,5 +590,5 @@ criage install my-package --repo mycompany
 ## Поддержка
 
 - 📧 Email: <support@criage.ru>
-- 🐛 Баги: <https://github.com/Zu-Krein/criage/issues>
+- 🐛 Баги: <https://github.com/criage-oss/criage/issues>
 - 📖 Документация: <https://docs.criage.ru>

@@ -189,6 +189,9 @@ func (pm *PackageManager) searchInRepository(repo Repository, query string) ([]S
 		req.Header.Set("Authorization", "Bearer "+repo.AuthToken)
 	}
 
+	// Применяем rate limiting
+	pm.rateLimiter.Wait()
+
 	resp, err := pm.httpClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -295,6 +298,9 @@ func (pm *PackageManager) uploadPackage(registryURL, token, archivePath string, 
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
 
+	// Применяем rate limiting
+	pm.rateLimiter.Wait()
+
 	resp, err := pm.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to upload: %w", err)
@@ -337,6 +343,9 @@ func (pm *PackageManager) GetRepositoryInfo(repositoryURL string) (map[string]in
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
+	// Применяем rate limiting
+	pm.rateLimiter.Wait()
+
 	resp, err := pm.httpClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute request: %w", err)
@@ -372,6 +381,9 @@ func (pm *PackageManager) GetRepositoryStats(repositoryURL string) (*RepositoryS
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
+
+	// Применяем rate limiting
+	pm.rateLimiter.Wait()
 
 	resp, err := pm.httpClient.Do(req)
 	if err != nil {
@@ -419,6 +431,9 @@ func (pm *PackageManager) RefreshRepositoryIndex(repositoryURL, authToken string
 	}
 	req.Header.Set("Content-Type", "application/json")
 
+	// Применяем rate limiting
+	pm.rateLimiter.Wait()
+
 	resp, err := pm.httpClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to execute request: %w", err)
@@ -443,4 +458,114 @@ func (pm *PackageManager) RefreshRepositoryIndex(repositoryURL, authToken string
 	}
 
 	return nil
+}
+
+// PackageListResponse структура ответа для списка пакетов
+type PackageListResponse struct {
+	Packages   []*PackageEntry `json:"packages"`
+	Total      int             `json:"total"`
+	Page       int             `json:"page"`
+	Limit      int             `json:"limit"`
+	TotalPages int             `json:"total_pages"`
+}
+
+// ListRepositoryPackages получает список всех пакетов из репозитория с пагинацией
+func (pm *PackageManager) ListRepositoryPackages(repositoryURL string, page, limit int) (*PackageListResponse, error) {
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 || limit > 100 {
+		limit = 20
+	}
+
+	url := fmt.Sprintf("%s/api/v1/packages?page=%d&limit=%d", repositoryURL, page, limit)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Применяем rate limiting
+	pm.rateLimiter.Wait()
+
+	resp, err := pm.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("server error: %d", resp.StatusCode)
+	}
+
+	var apiResp ApiResponse
+	if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	if !apiResp.Success {
+		return nil, fmt.Errorf("operation failed: %s", apiResp.Error)
+	}
+
+	// Парсим данные списка пакетов
+	responseBytes, err := json.Marshal(apiResp.Data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal response data: %w", err)
+	}
+
+	var packageList PackageListResponse
+	if err := json.Unmarshal(responseBytes, &packageList); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal package list: %w", err)
+	}
+
+	return &packageList, nil
+}
+
+// GetPackageVersion получает информацию о конкретной версии пакета
+func (pm *PackageManager) GetPackageVersion(repositoryURL, packageName, version string) (*VersionEntry, error) {
+	url := fmt.Sprintf("%s/api/v1/packages/%s/%s", repositoryURL, packageName, version)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	// Применяем rate limiting
+	pm.rateLimiter.Wait()
+
+	resp, err := pm.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to execute request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, fmt.Errorf("package version not found: %s@%s", packageName, version)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("server error: %d", resp.StatusCode)
+	}
+
+	var apiResp ApiResponse
+	if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	if !apiResp.Success {
+		return nil, fmt.Errorf("operation failed: %s", apiResp.Error)
+	}
+
+	// Парсим данные версии пакета
+	versionBytes, err := json.Marshal(apiResp.Data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal version data: %w", err)
+	}
+
+	var versionEntry VersionEntry
+	if err := json.Unmarshal(versionBytes, &versionEntry); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal version entry: %w", err)
+	}
+
+	return &versionEntry, nil
 }

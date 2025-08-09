@@ -3,8 +3,8 @@ version: 1.0.0
 description: "Criage - универсальный пакетный менеджер с поддержкой встроенной локализации"
 author: "Criage Team"
 license: MIT
-homepage: "https://github.com/criage/criage"
-repository: "https://github.com/criage/criage"
+homepage: "https://github.com/criage-oss/criage"
+repository: "https://github.com/criage-oss/criage"
 keywords:
   - package-manager
   - archive
