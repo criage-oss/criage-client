@@ -496,11 +496,8 @@ func (pm *PackageManager) findPackage(packageName, version, arch, osName string)
 
 // findInRepository ищет пакет в конкретном репозитории
 func (pm *PackageManager) findInRepository(repo Repository, packageName, version, arch, osName string) (*PackageInfo, string, error) {
-	// Простая реализация для HTTP репозиториев
-	url := fmt.Sprintf("%s/packages/%s", repo.URL, packageName)
-	if version != "" {
-		url += fmt.Sprintf("/%s", version)
-	}
+	// Используем API v1 criage-server
+	url := fmt.Sprintf("%s/api/v1/packages/%s", repo.URL, packageName)
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -521,15 +518,80 @@ func (pm *PackageManager) findInRepository(repo Repository, packageName, version
 		return nil, "", fmt.Errorf("package not found in repository")
 	}
 
-	var packageInfo PackageInfo
-	if err := json.NewDecoder(resp.Body).Decode(&packageInfo); err != nil {
+	var apiResp ApiResponse
+	if err := json.NewDecoder(resp.Body).Decode(&apiResp); err != nil {
 		return nil, "", err
 	}
 
-	downloadURL := fmt.Sprintf("%s/download/%s/%s/%s_%s.tar.zst",
-		repo.URL, packageName, packageInfo.Version, arch, osName)
+	if !apiResp.Success {
+		return nil, "", fmt.Errorf("API error: %s", apiResp.Error)
+	}
 
-	return &packageInfo, downloadURL, nil
+	// Преобразуем данные в PackageEntry
+	packageEntryData, ok := apiResp.Data.(map[string]interface{})
+	if !ok {
+		return nil, "", fmt.Errorf("unexpected API response format")
+	}
+
+	var packageEntry PackageEntry
+	packageEntryBytes, err := json.Marshal(packageEntryData)
+	if err != nil {
+		return nil, "", err
+	}
+
+	if err := json.Unmarshal(packageEntryBytes, &packageEntry); err != nil {
+		return nil, "", err
+	}
+
+	// Выбираем версию
+	var selectedVersion *VersionEntry
+	if version == "" {
+		// Берем последнюю версию
+		if len(packageEntry.Versions) > 0 {
+			selectedVersion = &packageEntry.Versions[len(packageEntry.Versions)-1]
+		}
+	} else {
+		// Ищем указанную версию
+		for _, v := range packageEntry.Versions {
+			if v.Version == version {
+				selectedVersion = &v
+				break
+			}
+		}
+	}
+
+	if selectedVersion == nil {
+		return nil, "", fmt.Errorf("version %s not found", version)
+	}
+
+	// Ищем подходящий файл
+	var selectedFile *FileEntry
+	for _, file := range selectedVersion.Files {
+		if file.OS == osName && file.Arch == arch {
+			selectedFile = &file
+			break
+		}
+	}
+
+	if selectedFile == nil {
+		return nil, "", fmt.Errorf("file for %s/%s not found", osName, arch)
+	}
+
+	// Создаем PackageInfo из PackageEntry
+	packageInfo := &PackageInfo{
+		Name:         packageEntry.Name,
+		Version:      selectedVersion.Version,
+		Description:  packageEntry.Description,
+		Author:       packageEntry.Author,
+		Dependencies: selectedVersion.Dependencies,
+		Size:         selectedFile.Size,
+	}
+
+	// Строим URL для скачивания используя API v1
+	downloadURL := fmt.Sprintf("%s/api/v1/download/%s/%s/%s",
+		repo.URL, packageEntry.Name, selectedVersion.Version, selectedFile.Filename)
+
+	return packageInfo, downloadURL, nil
 }
 
 // downloadPackage скачивает пакет

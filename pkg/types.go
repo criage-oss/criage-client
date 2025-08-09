@@ -118,6 +118,62 @@ type SearchResult struct {
 	Score       float64   `json:"score"`
 }
 
+// PackageEntry представляет информацию о пакете в репозитории (соответствует criage-server)
+type PackageEntry struct {
+	Name          string         `json:"name"`
+	Description   string         `json:"description"`
+	Author        string         `json:"author"`
+	License       string         `json:"license"`
+	Homepage      string         `json:"homepage"`
+	Repository    string         `json:"repository"`
+	Keywords      []string       `json:"keywords"`
+	Versions      []VersionEntry `json:"versions"`
+	LatestVersion string         `json:"latest_version"`
+	Downloads     int64          `json:"downloads"`
+	Updated       time.Time      `json:"updated"`
+}
+
+// VersionEntry представляет конкретную версию пакета (соответствует criage-server)
+type VersionEntry struct {
+	Version      string            `json:"version"`
+	Description  string            `json:"description"`
+	Dependencies map[string]string `json:"dependencies"`
+	DevDeps      map[string]string `json:"dev_dependencies"`
+	Files        []FileEntry       `json:"files"`
+	Size         int64             `json:"size"`
+	Checksum     string            `json:"checksum"`
+	Uploaded     time.Time         `json:"uploaded"`
+	Downloads    int64             `json:"downloads"`
+}
+
+// FileEntry представляет файл пакета для разных платформ (соответствует criage-server)
+type FileEntry struct {
+	OS       string `json:"os"`
+	Arch     string `json:"arch"`
+	Format   string `json:"format"`
+	Filename string `json:"filename"`
+	Size     int64  `json:"size"`
+	Checksum string `json:"checksum"`
+}
+
+// ApiResponse стандартный ответ API criage-server
+type ApiResponse struct {
+	Success bool        `json:"success"`
+	Message string      `json:"message,omitempty"`
+	Data    interface{} `json:"data,omitempty"`
+	Error   string      `json:"error,omitempty"`
+}
+
+// RepositoryStats статистика репозитория
+type RepositoryStats struct {
+	TotalDownloads    int64          `json:"total_downloads"`
+	PackagesByLicense map[string]int `json:"packages_by_license"`
+	PackagesByAuthor  map[string]int `json:"packages_by_author"`
+	PopularPackages   []string       `json:"popular_packages"`
+	LastUpdated       time.Time      `json:"last_updated"`
+	TotalPackages     int            `json:"total_packages"`
+}
+
 // ArchiveFormat поддерживаемые форматы архивов
 type ArchiveFormat string
 
