@@ -15,7 +15,7 @@ func init() {
 	var err error
 	packageManager, err = pkg.NewPackageManager()
 	if err != nil {
-		fmt.Printf(pkg.T("error_init_package_manager", err))
+		fmt.Print(pkg.T("error_init_package_manager", err))
 		os.Exit(1)
 	}
 }
@@ -44,7 +44,7 @@ func updateAllPackages() error {
 
 	for _, packageInfo := range packages {
 		if err := packageManager.UpdatePackage(packageInfo.Name); err != nil {
-			fmt.Printf(pkg.T("failed_to_update", packageInfo.Name, err))
+			fmt.Print(pkg.T("failed_to_update", packageInfo.Name, err))
 		}
 	}
 	return nil
@@ -57,7 +57,7 @@ func searchPackages(query string) error {
 		return err
 	}
 
-	fmt.Printf(pkg.T("packages_found", len(results)))
+	fmt.Print(pkg.T("packages_found", len(results)))
 	for _, result := range results {
 		fmt.Printf("- %s (%s): %s\n", result.Name, result.Version, result.Description)
 	}
@@ -71,7 +71,7 @@ func listPackages() error {
 		return err
 	}
 
-	fmt.Printf(pkg.T("packages_installed", len(packages)))
+	fmt.Print(pkg.T("packages_installed", len(packages)))
 	for _, pkg := range packages {
 		fmt.Printf("- %s (%s)\n", pkg.Name, pkg.Version)
 	}
@@ -118,7 +118,7 @@ func showArchiveMetadata(archivePath string) error {
 		return fmt.Errorf("failed to extract metadata: %w", err)
 	}
 
-	fmt.Printf(pkg.T("archive_metadata_title", archivePath))
+	fmt.Print(pkg.T("archive_metadata_title", archivePath))
 	fmt.Printf("%s: %s\n", pkg.T("compression_type"), metadata.CompressionType)
 	fmt.Printf("%s: %s\n", pkg.T("created_at"), metadata.CreatedAt)
 	fmt.Printf("%s: %s\n", pkg.T("created_by"), metadata.CreatedBy)
@@ -158,14 +158,14 @@ func showArchiveMetadata(archivePath string) error {
 
 // setConfig устанавливает значение конфигурации
 func setConfig(key, value string) error {
-	fmt.Printf(pkg.T("config_set", key, value))
+	fmt.Print(pkg.T("config_set", key, value))
 	// Здесь будет реализация установки конфигурации
 	return nil
 }
 
 // getConfig получает значение конфигурации
 func getConfig(key string) error {
-	fmt.Printf(pkg.T("config_get", key))
+	fmt.Print(pkg.T("config_get", key))
 	// Здесь будет реализация получения конфигурации
 	return nil
 }

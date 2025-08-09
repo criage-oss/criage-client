@@ -30,10 +30,9 @@ func NewRateLimiter(requestsPerSecond int) *RateLimiter {
 	ticker := time.NewTicker(interval)
 	requests := make(chan struct{}, requestsPerSecond)
 
-	// Заполняем буфер
-	for i := 0; i < requestsPerSecond; i++ {
-		requests <- struct{}{}
-	}
+	// Добавляем только один токен для первого запроса
+	// Остальные токены будут добавляться по тикам
+	requests <- struct{}{}
 
 	rl := &RateLimiter{
 		ticker:   ticker,
@@ -121,13 +120,13 @@ func NewPackageManager() (*PackageManager, error) {
 
 // InstallPackage устанавливает пакет
 func (pm *PackageManager) InstallPackage(packageName, version string, global, force, dev bool, arch, osName string) error {
-	fmt.Printf(T("installing_package", packageName))
+	fmt.Print(T("installing_package", packageName))
 
 	// Проверяем, не установлен ли уже пакет
 	if !force {
 		if info, exists := pm.getInstalledPackage(packageName); exists {
 			if version == "" || info.Version == version {
-				fmt.Printf(T("package_already_installed", packageName, info.Version))
+				fmt.Print(T("package_already_installed", packageName, info.Version))
 				return nil
 			}
 		}
@@ -226,33 +225,33 @@ func (pm *PackageManager) InstallPackage(packageName, version string, global, fo
 
 	// Выполняем пост-установочные хуки
 	if err := pm.executeHooks(manifest.Hooks, manifest.Hooks.PostInstall, installPath); err != nil {
-		fmt.Printf(T("error_post_install_hooks", err))
+		fmt.Print(T("error_post_install_hooks", err))
 	}
 
-	fmt.Printf(T("package_installed", packageName, packageInfo.Version))
+	fmt.Print(T("package_installed", packageName, packageInfo.Version))
 	return nil
 }
 
 // UninstallPackage удаляет пакет
 func (pm *PackageManager) UninstallPackage(packageName string, global, purge bool) error {
-	fmt.Printf(T("uninstalling_package", packageName))
+	fmt.Print(T("uninstalling_package", packageName))
 
 	// Проверяем, установлен ли пакет
 	packageInfo, exists := pm.getInstalledPackage(packageName)
 	if !exists {
-		return fmt.Errorf(T("package_not_installed", packageName))
+		return fmt.Errorf("%s", T("package_not_installed", packageName))
 	}
 
 	// Загружаем манифест
 	manifest, err := pm.loadManifestFromDir(packageInfo.InstallPath)
 	if err != nil {
-		fmt.Printf(T("warning_failed_to_load", err))
+		fmt.Print(T("warning_failed_to_load", err))
 	}
 
 	// Выполняем пре-удаление хуки
 	if manifest != nil && manifest.Hooks != nil {
 		if err := pm.executeHooks(manifest.Hooks, manifest.Hooks.PreRemove, packageInfo.InstallPath); err != nil {
-			fmt.Printf(T("warning_pre_remove_hooks", err))
+			fmt.Print(T("warning_pre_remove_hooks", err))
 		}
 	}
 
@@ -274,11 +273,11 @@ func (pm *PackageManager) UninstallPackage(packageName string, global, purge boo
 	// Выполняем пост-удаление хуки
 	if manifest != nil && manifest.Hooks != nil {
 		if err := pm.executeHooks(manifest.Hooks, manifest.Hooks.PostRemove, ""); err != nil {
-			fmt.Printf(T("warning_post_remove_hooks", err))
+			fmt.Print(T("warning_post_remove_hooks", err))
 		}
 	}
 
-	fmt.Printf(T("package_uninstalled", packageName))
+	fmt.Print(T("package_uninstalled", packageName))
 	return nil
 }
 
