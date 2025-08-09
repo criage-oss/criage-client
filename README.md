@@ -41,8 +41,8 @@
 ### From Source
 
 ```bash
-git clone https://github.com/criage-oss/criage.git
-cd criage
+git clone https://github.com/criage-oss/criage-client.git
+cd criage-client
 go build -o criage
 sudo mv criage /usr/local/bin/
 ```
@@ -499,8 +499,8 @@ Criage is optimized for maximum performance:
 ### Building from Source
 
 ```bash
-git clone https://github.com/criage-oss/criage.git
-cd criage
+git clone https://github.com/criage-oss/criage-client.git
+cd criage-client
 go mod tidy
 go build -o criage
 ```
@@ -537,8 +537,8 @@ Criage supports creating custom repositories for private use or organizations.
 
 ```bash
 # Clone the project
-git clone https://github.com/criage-oss/criage.git
-cd criage/repository
+git clone https://github.com/criage-oss/criage-client.git
+cd criage-client/repository
 
 # Build repository server
 go build -o criage-repository
@@ -590,5 +590,5 @@ criage install my-package --repo mycompany
 ## Support
 
 - 📧 Email: <support@criage.ru>
-- 🐛 Issues: <https://github.com/criage-oss/criage/issues>
+- 🐛 Issues: <https://github.com/criage-oss/criage-client/issues>
 - 📖 Documentation: <https://docs.criage.ru>
