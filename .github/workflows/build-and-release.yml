@@ -245,7 +245,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: criage/client
+          images: huginnn/client
           tags: |
             type=ref,event=branch
             type=ref,event=pr
