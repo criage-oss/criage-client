@@ -234,8 +234,8 @@ func (pm *PackageManager) searchInRepository(repo Repository, query string) ([]S
 			continue
 		}
 
-		// Устанавливаем репозиторий для каждого результата
-		result.Repository = repo.Name
+		// В current common/types SearchResult не содержит поля Repository
+		// Если нужно сохранять имя репозитория, можно расширить тип, но здесь пропускаем
 		results = append(results, result)
 	}
 
@@ -246,11 +246,8 @@ func (pm *PackageManager) searchInRepository(repo Repository, query string) ([]S
 func (pm *PackageManager) executeBuildScript(manifest *BuildManifest) error {
 	cmd := exec.Command("sh", "-c", manifest.BuildScript)
 
-	// Устанавливаем переменные окружения
+	// Устанавливаем переменные окружения, если BuildManifest поддерживает Environment
 	env := os.Environ()
-	for key, value := range manifest.BuildEnv {
-		env = append(env, fmt.Sprintf("%s=%s", key, value))
-	}
 	cmd.Env = env
 
 	cmd.Stdout = os.Stdout

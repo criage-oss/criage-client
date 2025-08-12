@@ -30,9 +30,7 @@ func NewRateLimiter(requestsPerSecond int) *RateLimiter {
 	ticker := time.NewTicker(interval)
 	requests := make(chan struct{}, requestsPerSecond)
 
-	// Добавляем только один токен для первого запроса
-	// Остальные токены будут добавляться по тикам
-	requests <- struct{}{}
+	// Изначально не заполняем канал, токены будут поступать по тикам
 
 	rl := &RateLimiter{
 		ticker:   ticker,
@@ -45,7 +43,7 @@ func NewRateLimiter(requestsPerSecond int) *RateLimiter {
 			select {
 			case requests <- struct{}{}:
 			default:
-				// Буфер полон, пропускаем
+				// буфер полон
 			}
 		}
 	}()
@@ -61,13 +59,17 @@ func (rl *RateLimiter) Wait() {
 // Close останавливает rate limiter
 func (rl *RateLimiter) Close() {
 	rl.ticker.Stop()
-	close(rl.requests)
 }
 
 // PackageManager основной менеджер пакетов
 type PackageManager struct {
-	configManager     *ConfigManager
-	archiveManager    *ArchiveManager
+	configManager  *ConfigManager
+	archiveManager interface {
+		DetectFormat(filename string) ArchiveFormat
+		ExtractArchive(archivePath, destDir string, format ArchiveFormat) error
+		CreateArchiveWithMetadata(sourceDir, outputPath string, format ArchiveFormat, includeFiles, excludeFiles []string, metadata *PackageMetadata) error
+		Close() error
+	}
 	installedPackages map[string]*PackageInfo
 	packagesMutex     sync.RWMutex
 	httpClient        *http.Client
@@ -87,7 +89,8 @@ func NewPackageManager() (*PackageManager, error) {
 		version = "1.0.0"
 	}
 
-	archiveManager, err := NewArchiveManager(configManager.GetConfig(), version)
+	// Используем общий архивный менеджер напрямую
+	archiveManager, err := NewCommonArchiveManager(configManager.GetConfig(), version)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create archive manager: %w", err)
 	}

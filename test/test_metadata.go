@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"criage/pkg"
 )
@@ -20,7 +21,7 @@ func main() {
 
 	// Создаем архивный менеджер
 	config := pkg.DefaultConfig()
-	archiveManager, err := pkg.NewArchiveManager(config, "1.0.0")
+	archiveManager, err := pkg.NewCommonArchiveManager(config, "1.0.0")
 	if err != nil {
 		log.Fatalf("Ошибка создания архивного менеджера: %v", err)
 	}
@@ -39,7 +40,7 @@ func main() {
 	// Выводим метаданные
 	fmt.Printf("\n=== Метаданные архива %s ===\n", archivePath)
 	fmt.Printf("Тип сжатия: %s\n", metadata.CompressionType)
-	fmt.Printf("Создан: %s\n", metadata.CreatedAt)
+	fmt.Printf("Создан: %s\n", metadata.CreatedAt.Format(time.RFC3339))
 	fmt.Printf("Создано с помощью: %s\n", metadata.CreatedBy)
 
 	if metadata.PackageManifest != nil {

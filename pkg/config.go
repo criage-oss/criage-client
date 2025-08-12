@@ -7,16 +7,17 @@ import (
 	"path/filepath"
 	"strings"
 
+	commontypes "github.com/criage-oss/criage-common/types"
 	"gopkg.in/yaml.v3"
 )
 
 const (
-	ConfigFileName     = "config.yaml"
-	LocalConfigName    = "criage.yaml"
-	DefaultConfigDir   = ".config/criage"
-	DefaultCacheDir    = ".cache/criage"
-	DefaultGlobalPath  = "/usr/local/lib/criage"
-	DefaultLocalPath   = "./criage_modules"
+	ConfigFileName    = "config.yaml"
+	LocalConfigName   = "criage.yaml"
+	DefaultConfigDir  = ".config/criage"
+	DefaultCacheDir   = ".cache/criage"
+	DefaultGlobalPath = "/usr/local/lib/criage"
+	DefaultLocalPath  = "./criage_modules"
 )
 
 // ConfigManager управляет конфигурацией criage
@@ -44,16 +45,16 @@ func NewConfigManager() (*ConfigManager, error) {
 	if err != nil {
 		// Если конфигурация не найдена, создаем новую
 		config = DefaultConfig()
-		
+
 		// Настраиваем пути относительно домашней директории
 		config.CachePath = filepath.Join(homeDir, DefaultCacheDir)
 		config.TempPath = filepath.Join(os.TempDir(), "criage")
-		
+
 		// Создаем директории
 		if err := os.MkdirAll(configDir, 0755); err != nil {
 			return nil, fmt.Errorf("failed to create config directory: %w", err)
 		}
-		
+
 		if err := cm.saveConfig(config); err != nil {
 			return nil, fmt.Errorf("failed to save default config: %w", err)
 		}
@@ -197,7 +198,6 @@ func (cm *ConfigManager) AddRepository(name, url, repoType string, priority int)
 			cm.config.Repositories[i] = Repository{
 				Name:     name,
 				URL:      url,
-				Type:     repoType,
 				Priority: priority,
 				Enabled:  true,
 			}
@@ -209,7 +209,6 @@ func (cm *ConfigManager) AddRepository(name, url, repoType string, priority int)
 	cm.config.Repositories = append(cm.config.Repositories, Repository{
 		Name:     name,
 		URL:      url,
-		Type:     repoType,
 		Priority: priority,
 		Enabled:  true,
 	})
@@ -234,10 +233,21 @@ func (cm *ConfigManager) GetRepositories() []Repository {
 	return cm.config.Repositories
 }
 
+// GetRepositoriesCommon возвращает репозитории в формате common/types.Repository
+func (cm *ConfigManager) GetRepositoriesCommon() []commontypes.Repository {
+	return cm.config.Repositories
+}
+
+// SetRepositoriesCommon устанавливает репозитории из формата common/types.Repository
+func (cm *ConfigManager) SetRepositoriesCommon(repos []commontypes.Repository) error {
+	cm.config.Repositories = repos
+	return cm.saveConfig(cm.config)
+}
+
 // LoadLocalConfig загружает локальную конфигурацию проекта
 func (cm *ConfigManager) LoadLocalConfig(projectPath string) (*PackageManifest, error) {
 	configPath := filepath.Join(projectPath, LocalConfigName)
-	
+
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("local config not found")
 	}
@@ -248,17 +258,26 @@ func (cm *ConfigManager) LoadLocalConfig(projectPath string) (*PackageManifest, 
 	}
 
 	var manifest PackageManifest
-	if err := yaml.Unmarshal(data, &manifest); err != nil {
-		return nil, fmt.Errorf("failed to parse local config: %w", err)
+	if err := yaml.Unmarshal(data, &manifest); err == nil {
+		return &manifest, nil
 	}
 
-	return &manifest, nil
+	// Попробуем распарсить как общую структуру и сконвертировать
+	var common commontypes.PackageManifest
+	if err := yaml.Unmarshal(data, &common); err == nil {
+		return &common, nil
+	}
+	if err := json.Unmarshal(data, &common); err == nil {
+		return &common, nil
+	}
+
+	return nil, fmt.Errorf("failed to parse local config: unsupported format")
 }
 
 // SaveLocalConfig сохраняет локальную конфигурацию проекта
 func (cm *ConfigManager) SaveLocalConfig(projectPath string, manifest *PackageManifest) error {
 	configPath := filepath.Join(projectPath, LocalConfigName)
-	
+
 	data, err := yaml.Marshal(manifest)
 	if err != nil {
 		return fmt.Errorf("failed to marshal config: %w", err)
@@ -274,7 +293,7 @@ func (cm *ConfigManager) SaveLocalConfig(projectPath string, manifest *PackageMa
 // LoadBuildConfig загружает конфигурацию сборки
 func (cm *ConfigManager) LoadBuildConfig(projectPath string) (*BuildManifest, error) {
 	configPath := filepath.Join(projectPath, "build.json")
-	
+
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		return nil, fmt.Errorf("build config not found")
 	}
@@ -295,7 +314,7 @@ func (cm *ConfigManager) LoadBuildConfig(projectPath string) (*BuildManifest, er
 // SaveBuildConfig сохраняет конфигурацию сборки
 func (cm *ConfigManager) SaveBuildConfig(projectPath string, manifest *BuildManifest) error {
 	configPath := filepath.Join(projectPath, "build.json")
-	
+
 	data, err := json.MarshalIndent(manifest, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal build config: %w", err)

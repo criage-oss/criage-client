@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"criage/pkg"
 
@@ -106,7 +107,8 @@ func publishPackage() error {
 
 // showArchiveMetadata показывает метаданные архива
 func showArchiveMetadata(archivePath string) error {
-	archiveManager, err := pkg.NewArchiveManager(pkg.DefaultConfig(), version)
+	// Используем общий архивный менеджер через фабрику
+	archiveManager, err := pkg.NewCommonArchiveManager(pkg.DefaultConfig(), version)
 	if err != nil {
 		return fmt.Errorf("failed to create archive manager: %w", err)
 	}
@@ -120,7 +122,7 @@ func showArchiveMetadata(archivePath string) error {
 
 	fmt.Print(pkg.T("archive_metadata_title", archivePath))
 	fmt.Printf("%s: %s\n", pkg.T("compression_type"), metadata.CompressionType)
-	fmt.Printf("%s: %s\n", pkg.T("created_at"), metadata.CreatedAt)
+	fmt.Printf("%s: %s\n", pkg.T("created_at"), metadata.CreatedAt.Format(time.RFC3339))
 	fmt.Printf("%s: %s\n", pkg.T("created_by"), metadata.CreatedBy)
 
 	if metadata.PackageManifest != nil {
