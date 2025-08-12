@@ -2,7 +2,9 @@
   <img src="logo.png" alt="Criage Logo" width="200">
   
 # Criage - High-Performance Package Manager
-  
+
+  [![Go Reference](https://pkg.go.dev/badge/github.com/criage-oss/criage-client.svg)](https://pkg.go.dev/github.com/criage-oss/criage-client)
+
   Criage is a modern package manager written in Go, providing fast installation, updates, and package management with support for various compression formats.
   
   🇬🇧 English Version | [🇷🇺 Русская версия](README_ru.md)
