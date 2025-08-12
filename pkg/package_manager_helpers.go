@@ -162,7 +162,7 @@ func (pm *PackageManager) copyFile(src, dst string) error {
 func (pm *PackageManager) calculateDirSize(dir string) int64 {
 	var size int64
 
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return nil
 		}
@@ -170,7 +170,10 @@ func (pm *PackageManager) calculateDirSize(dir string) int64 {
 			size += info.Size()
 		}
 		return nil
-	})
+	}); err != nil {
+		// если Walk вернул ошибку обхода корня, просто возвращаем то, что успели посчитать
+		return size
+	}
 
 	return size
 }

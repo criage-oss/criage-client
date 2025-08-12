@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"criage/pkg"
-
-	"github.com/spf13/cobra"
 )
 
 var packageManager *pkg.PackageManager
@@ -179,23 +177,4 @@ func listConfig() error {
 	return nil
 }
 
-// getCurrentCommand возвращает текущую команду для доступа к флагам
-func getCurrentCommand() *cobra.Command {
-	// Это вспомогательная функция для получения текущей команды
-	// В реальной реализации нужно передавать команду через контекст
-	return &cobra.Command{}
-}
-
-// formatSize форматирует размер в человеко-читаемый формат
-func formatSize(bytes int64) string {
-	const unit = 1024
-	if bytes < unit {
-		return fmt.Sprintf("%d B", bytes)
-	}
-	div, exp := int64(unit), 0
-	for n := bytes / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB", float64(bytes)/float64(div), "KMGTPE"[exp])
-}
+// (удалены неиспользуемые вспомогательные функции)
