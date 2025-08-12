@@ -208,16 +208,14 @@ jobs:
           path: artifacts
           merge-multiple: true
 
-      - name: Prepare release assets
-        run: |
-          mkdir -p release
-          find artifacts -name "*.zip" -o -name "*.tar.gz" -exec cp {} release/ \;
-          ls -la release/
-
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: release/*
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            artifacts/**/*.zip
+            artifacts/**/*.tar.gz
+            artifacts/**/*.exe
           body: |
             ## Criage Client v${{ env.VERSION }}
             
