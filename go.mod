@@ -3,7 +3,7 @@ module criage
 go 1.24.4
 
 require (
-	github.com/criage-oss/criage-common v1.0.6
+	github.com/criage-oss/criage-common v1.0.7
 	github.com/spf13/cobra v1.9.1
 	gopkg.in/yaml.v3 v3.0.1
 )
