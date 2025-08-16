@@ -3,7 +3,7 @@
   
 # Criage - Высокопроизводительный пакетный менеджер
 
-  [![Go Reference](https://pkg.go.dev/badge/github.com/criage-oss/criage-client.svg)](https://pkg.go.dev/github.com/criage-oss/criage-client)
+  [![Go Reference](https://pkg.go.dev/badge/github.com/criage-oss/criage-client.svg)](https://pkg.go.dev/github.com/criage-oss/criage-client) [![Build and Release Criage Client](https://github.com/criage-oss/criage-client/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/criage-oss/criage-client/actions/workflows/build-and-release.yml)
 
   Criage - это современный пакетный менеджер, написанный на Go, обеспечивающий быструю установку, обновление и управление пакетами с поддержкой различных форматов сжатия.
   
